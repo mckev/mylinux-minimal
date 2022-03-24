@@ -53,11 +53,11 @@ Debian 10.
        - Build kernel:
             ```
             $ make bzImage
-...
-  OBJCOPY arch/x86/boot/vmlinux.bin
-  HOSTCC  arch/x86/boot/tools/build
-  BUILD   arch/x86/boot/bzImage
-Kernel: arch/x86/boot/bzImage is ready  (#1)
+            ...
+              OBJCOPY arch/x86/boot/vmlinux.bin
+              HOSTCC  arch/x86/boot/tools/build
+              BUILD   arch/x86/boot/bzImage
+            Kernel: arch/x86/boot/bzImage is ready  (#1)
 
             $ ls -al $WORKDIR/kernel/linux-5.13.12/arch/x86/boot/bzImage
             ```
@@ -130,30 +130,30 @@ Kernel: arch/x86/boot/bzImage is ready  (#1)
             $ make distclean
             $ make defconfig
             $ vi .config
-                 - Replace:
-CONFIG_SYSROOT=""
-                   with:
-CONFIG_SYSROOT="/data/mylinux/sysroot"
+              Replace:
+              CONFIG_SYSROOT=""
+              with:
+              CONFIG_SYSROOT="/data/mylinux/sysroot"
 
-                 - Replace:
-CONFIG_EXTRA_CFLAGS=""
-                   with:
-CONFIG_EXTRA_CFLAGS="-L/data/mylinux/sysroot/lib"
+              Replace:
+              CONFIG_EXTRA_CFLAGS=""
+              with:
+              CONFIG_EXTRA_CFLAGS="-L/data/mylinux/sysroot/lib"
 
             $ make busybox
               Output:
-...
-  CC      util-linux/volume_id/xfs.o
-  AR      util-linux/volume_id/lib.a
-  LINK    busybox_unstripped
-Trying libraries: crypt m resolv rt
- Library crypt is not needed, excluding it
- Library m is needed, can't exclude it (yet)
- Library resolv is needed, can't exclude it (yet)
- Library rt is not needed, excluding it
- Library m is needed, can't exclude it (yet)
- Library resolv is needed, can't exclude it (yet)
-Final link with: m resolv
+              ...
+                CC      util-linux/volume_id/xfs.o
+                AR      util-linux/volume_id/lib.a
+                LINK    busybox_unstripped
+              Trying libraries: crypt m resolv rt
+               Library crypt is not needed, excluding it
+               Library m is needed, can't exclude it (yet)
+               Library resolv is needed, can't exclude it (yet)
+               Library rt is not needed, excluding it
+               Library m is needed, can't exclude it (yet)
+               Library resolv is needed, can't exclude it (yet)
+              Final link with: m resolv
             ```
 
        - Copy:
