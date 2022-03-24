@@ -1,6 +1,12 @@
 # mylinux-minimal
 A bootable 12 MB Linux with networking
 
+Features:
+  - 64-bit Linux OS.
+  - Modern UEFI 64-bit boot.
+  - GUID Partition Table (GPT).
+  - Supports DHCP and networking.
+
 
 ## Build OS
 
