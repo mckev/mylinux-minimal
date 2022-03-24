@@ -19,23 +19,28 @@ Debian 10.
 # Build
 
  1. Preparations:
+       ```
        $ sudo mkdir /data
        $ sudo chown $USER:`id -gn $USER` /data
 
        $ WORKDIR=/data/mylinux
        $ mkdir $WORKDIR
        $ cd $WORKDIR/
+       ```
 
 
  2. Compile Linux Kernel:
        - Download:
+            ```
             $ mkdir $WORKDIR/kernel
             $ cd $WORKDIR/kernel/
             $ wget https://kernel.org/pub/linux/kernel/v5.x/linux-5.13.12.tar.xz
             $ tar xvf linux-5.13.12.tar.xz
             $ cd linux-5.13.12/
+            ```
 
        - Preparations:
+            ```
             $ sudo apt install -y flex bison libssl-dev bc libelf-dev
             - Clean:
                  $ make mrproper
@@ -43,8 +48,10 @@ Debian 10.
                  $ make defconfig
             - Edit .config:
                  $ vi .config
+            ```
 
        - Build kernel:
+            ```
             $ make bzImage
 ...
   OBJCOPY arch/x86/boot/vmlinux.bin
@@ -53,39 +60,51 @@ Debian 10.
 Kernel: arch/x86/boot/bzImage is ready  (#1)
 
             $ ls -al $WORKDIR/kernel/linux-5.13.12/arch/x86/boot/bzImage
+            ```
 
        - Generate kernel headers:
+            ```
             $ rm -rf $WORKDIR/kernel_headers
             $ mkdir $WORKDIR/kernel_headers
             $ sudo apt install -y rsync
             $ make INSTALL_HDR_PATH=$WORKDIR/kernel_headers headers_install
+            ```
 
 
  3. Compile glibc:
        - Download:
+            ```
             $ mkdir $WORKDIR/glibc_src
             $ cd $WORKDIR/glibc_src/
             $ wget https://ftp.gnu.org/gnu/glibc/glibc-2.33.tar.bz2
             $ tar xvf glibc-2.33.tar.bz2
             $ cd glibc-2.33/
+            ```
 
        - Preparations:
+            ```
             $ sudo apt install -y gawk
+            ```
 
        - Compile:
+            ```
             $ rm -rf $WORKDIR/glibc_obj
             $ mkdir $WORKDIR/glibc_obj
             $ cd $WORKDIR/glibc_obj/
             $ $WORKDIR/glibc_src/glibc-2.33/configure --prefix= --with-headers=$WORKDIR/kernel_headers/include --without-gd --without-selinux
             $ make
+            ```
 
        - Copy:
+            ```
             $ rm -rf $WORKDIR/glibc
             $ mkdir $WORKDIR/glibc
             $ make install DESTDIR=$WORKDIR/glibc
+            ```
 
 
  4. Create sysroot:
+       ```
        $ rm -rf $WORKDIR/sysroot
        $ mkdir $WORKDIR/sysroot
        $ cp -r $WORKDIR/glibc/* $WORKDIR/sysroot/
@@ -93,17 +112,21 @@ Kernel: arch/x86/boot/bzImage is ready  (#1)
        $ mkdir $WORKDIR/sysroot/usr
        $ ln -s ../include $WORKDIR/sysroot/usr/include
        $ ln -s ../lib $WORKDIR/sysroot/usr/lib
+       ```
 
 
  5. Compile busybox:
        - Download:
+            ```
             $ mkdir $WORKDIR/busybox_src
             $ cd $WORKDIR/busybox_src/
             $ wget https://busybox.net/downloads/busybox-1.34.0.tar.bz2
             $ tar xvf busybox-1.34.0.tar.bz2
             $ cd busybox-1.34.0/
+            ```
 
        - Build:
+            ```
             $ make distclean
             $ make defconfig
             $ vi .config
@@ -131,16 +154,19 @@ Trying libraries: crypt m resolv rt
  Library m is needed, can't exclude it (yet)
  Library resolv is needed, can't exclude it (yet)
 Final link with: m resolv
-
+            ```
 
        - Copy:
+            ```
             $ rm -rf $WORKDIR/busybox
             $ mkdir $WORKDIR/busybox
             $ make CONFIG_PREFIX="/data/mylinux/busybox" install
+            ```
 
 
  6. Create rootfs:
        - Create:
+            ```
             $ rm -rf $WORKDIR/rootfs
             $ cd $WORKDIR/
             $ tar xvzf rootfs_overlay.tgz
@@ -161,20 +187,26 @@ Final link with: m resolv
 
             $ strip --strip-debug $WORKDIR/rootfs/bin/* $WORKDIR/rootfs/sbin/*
             $ strip --strip-debug $WORKDIR/rootfs/lib/* $WORKDIR/rootfs/lib64/*
+            ```
 
 
        - Pack rootfs:
+            ```
             $ rm -f $WORKDIR/rootfs.cpio.xz
             $ cd $WORKDIR/rootfs/
             $ find . | cpio -R root:root -H newc -o | xz -9 --check=crc32 > $WORKDIR/rootfs.cpio.xz
+            ```
 
 
  7. Create UEFI boot image:
        - Create:
+            ```
             $ cd $WORKDIR/
             $ tar xvzf uefi_overlay.tgz
+            ```
 
        - Create uefi.img:
+            ```
             $ rm -f $WORKDIR/uefi.img
             $ truncate -s 12582912 $WORKDIR/uefi.img
             $ LOOP_DEVICE_HDD=$(sudo /sbin/losetup -f)
@@ -183,8 +215,10 @@ Final link with: m resolv
             $ sudo losetup $LOOP_DEVICE_HDD $WORKDIR/uefi.img
             $ sudo mkfs.vfat $LOOP_DEVICE_HDD
             mkfs.fat 4.1 (2017-01-24)
+            ```
 
        - Populate uefi.img:
+            ```
             $ mkdir $WORKDIR/uefi
             $ sudo mount $WORKDIR/uefi.img $WORKDIR/uefi
             $ sudo cp -r $WORKDIR/uefi_overlay/* $WORKDIR/uefi/
@@ -192,21 +226,28 @@ Final link with: m resolv
             $ sudo cp $WORKDIR/rootfs.cpio.xz $WORKDIR/uefi/minimal/x86_64/rootfs.xz
             $ sudo umount $WORKDIR/uefi
             $ rmdir $WORKDIR/uefi
+            ```
 
 
  8. Create ISO image:
        - Pre-requisites:
+            ```
             $ sudo apt install -y xorriso
+            ```
        - Download syslinux:
+            ```
             $ mkdir $WORKDIR/syslinux
             $ cd $WORKDIR/syslinux/
             $ wget https://kernel.org/pub/linux/utils/boot/syslinux/syslinux-6.03.tar.xz
             $ tar xvf syslinux-6.03.tar.xz
+            ```
        - Create:
+            ```
             $ rm -rf $WORKDIR/isoimage
             $ mkdir -p $WORKDIR/isoimage/boot
             $ cp $WORKDIR/uefi.img $WORKDIR/isoimage/boot/
             $ xorriso -as mkisofs -isohybrid-mbr $WORKDIR/syslinux/syslinux-6.03/bios/mbr/isohdpfx.bin -e boot/uefi.img -no-emul-boot -isohybrid-gpt-basdat -o $WORKDIR/minimal_linux_live.iso $WORKDIR/isoimage/
+            ```
        - File $WORKDIR/minimal_linux_live.iso is generated.
 
 
