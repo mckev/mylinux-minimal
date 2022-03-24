@@ -305,3 +305,8 @@ Debian 10.
             - Press "F12" to enter "BOOT MENU". Notice this is very system dependent.
             - Click "UEFI: Samsung Type-C 1100, Partition 1".
             - It shows "Minimal Linux Live" in the boot menu. Then Linux boots up.
+
+
+## Acknowledgement
+
+The steps were inspired from https://github.com/ivandavidov/minimal
