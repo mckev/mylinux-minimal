@@ -313,6 +313,11 @@ Debian 10.
             - It shows "Minimal Linux Live" in the boot menu. Then Linux boots up.
 
 
+## How It Works
+
+See how_it_works.md.
+
+
 ## Acknowledgement
 
 The steps were inspired from https://github.com/ivandavidov/minimal
